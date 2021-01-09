@@ -1,6 +1,6 @@
 ---
 applications:
-- instances: 1
+- instances: 2
   timeout: 180
   name: mysampleapp
   buildpack: sdk-for-nodejs
