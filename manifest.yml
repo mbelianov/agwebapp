@@ -3,7 +3,7 @@ applications:
 - instances: 1
   timeout: 180
   name: mysampleapp
-  buildpack: sdk-for-nodejs
+  buildpacks: sdk-for-nodejs
   command: npm start
   disk_quota: 1G
   memory: 128MB
