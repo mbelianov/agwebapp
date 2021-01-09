@@ -3,8 +3,7 @@ applications:
 - instances: 1
   timeout: 180
   name: mysampleapp
-  buildpacks: 
-    - https://github.com/cloudfoundry/nodejs-buildpack
+  buildpack: sdk-for-nodejs 
   command: npm start
   disk_quota: 1G
   memory: 128MB
