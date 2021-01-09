@@ -10,7 +10,7 @@ applications:
   domain: eu-de.mybluemix.net
   host: my-sample-app-test
   services:
-    - my-cloudant-db-12255
+    - my-cloudant-db-test-alias
   env:
     OPTIMIZE_MEMORY: true
 
