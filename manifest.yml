@@ -1,0 +1,15 @@
+---
+applications:
+- instances: 1
+  timeout: 180
+  name: mysampleapp
+  buildpack: sdk-for-nodejs
+  command: npm start
+  disk_quota: 1G
+  memory: 128MB
+  domain: eu-de.mybluemix.net
+  host: my-sample-app-dev
+  services:
+    - my-cloudant-db-12255
+  env:
+    OPTIMIZE_MEMORY: true
