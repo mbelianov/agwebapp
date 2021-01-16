@@ -3,67 +3,67 @@
   "cloudant_url": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.url",
-      "file:/server/localdev-config.json:$.cloudant_url"
+      "file:/server/localdev-config.json:$.url"
     ]
   },
   "cloudant_apikey": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.apikey",
-      "file:/server/localdev-config.json:$.cloudant_apikey"
+      "file:/server/localdev-config.json:$.apikey"
     ]
   },
   "cloudant_host": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.host",
-      "file:/server/localdev-config.json:$.cloudant_host"
+      "file:/server/localdev-config.json:$.host"
     ]
   },
   "cloudant_iam_apikey_description": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.iam_apikey_description",
-      "file:/server/localdev-config.json:$.cloudant_iam_apikey_description"
+      "file:/server/localdev-config.json:$.iam_apikey_description"
     ]
   },
   "cloudant_iam_apikey_name": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.iam_apikey_name",
-      "file:/server/localdev-config.json:$.cloudant_iam_apikey_name"
+      "file:/server/localdev-config.json:$.iam_apikey_name"
     ]
   },
   "cloudant_iam_role_crn": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.iam_role_crn",
-      "file:/server/localdev-config.json:$.cloudant_iam_role_crn"
+      "file:/server/localdev-config.json:$.iam_role_crn"
     ]
   },
   "cloudant_iam_serviceid_crn": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.iam_serviceid_crn",
-      "file:/server/localdev-config.json:$.cloudant_iam_serviceid_crn"
+      "file:/server/localdev-config.json:$.iam_serviceid_crn"
     ]
   },
   "cloudant_password": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.password",
-      "file:/server/localdev-config.json:$.cloudant_password"
+      "file:/server/localdev-config.json:$.password"
     ]
   },
   "cloudant_port": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.port",
-      "file:/server/localdev-config.json:$.cloudant_port"
+      "file:/server/localdev-config.json:$.port"
     ]
   },
   "cloudant_username": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.username",
-      "file:/server/localdev-config.json:$.cloudant_username"
+      "file:/server/localdev-config.json:$.username"
     ]
   },
   "cloudant_serviceInfo": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.serviceInfo",
-      "file:/server/localdev-config.json:$.cloudant_serviceInfo"
+      "file:/server/localdev-config.json:$.serviceInfo"
     ]
   }
 }
