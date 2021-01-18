@@ -10,5 +10,14 @@
     "parserOptions": { 
         "ecmaVersion": 10,
         "sourceType": "module"
+    },
+    "rules":{
+        "max-len": [
+            "error", 
+            { "ignoreUrls": true },
+            { "ignoreTrailingComments": true },
+            { "ignoreStrings": true }
+        ],
+        "no-multi-spaces": ["error", { "ignoreEOLComments": true }]
     }
 }
