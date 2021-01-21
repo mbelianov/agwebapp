@@ -48,6 +48,7 @@ app.use(bodyParser.json());
 /* istanbul ignore if  */
 if (process.env.VCAP_APPLICATION) {
   app.use(helmet());
+  console.log(JSON.parse(process.env.VCAP_APPLICATION));
 }
 
 // handle callback
