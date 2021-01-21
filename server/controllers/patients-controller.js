@@ -23,7 +23,7 @@ const patients_db = cloudant.db.use('patients-db');
 
 // get names from database
 exports.getPatients = (req, res, next) => {
-  console.log('In route - getNames');
+  console.log('In route - getPatients');
   return patients_db.list({include_docs: true})
     .then(fetchedNames => {
       let names = [];
@@ -36,13 +36,13 @@ exports.getPatients = (req, res, next) => {
         };
         row = row + 1;
       });
-      console.log('Get names successful');
+      console.log('Get patients successful');
       return res.status(200).json(names);
     })
     .catch(error => {
-      console.log('Get names failed');
+      console.log('Get patients failed');
       return res.status(500).json({
-        message: 'Get names failed.',
+        message: 'Get patients failed.',
         error: error,
       });
     });
@@ -50,14 +50,14 @@ exports.getPatients = (req, res, next) => {
 
 // add name to database
 exports.addPatient = (req, res, next) => {
-  console.log('In route - addName');
+  console.log('In route - addPatient');
   let name = {
     name: req.body.name,
     timestamp: req.body.timestamp,
   };
   return patients_db.insert(name)
     .then(addedName => {
-      console.log('Add name successful');
+      console.log('Add patient successful');
       return res.status(201).json({
         _id: addedName.id,
         name: addedName.name,
@@ -65,9 +65,9 @@ exports.addPatient = (req, res, next) => {
       });
     })
     .catch(error => {
-      console.log('Add name failed');
+      console.log('Add patient failed');
       return res.status(500).json({
-        message: 'Add name failed.',
+        message: 'Add patient failed.',
         error: error,
       });
     });

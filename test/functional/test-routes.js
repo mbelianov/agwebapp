@@ -32,20 +32,28 @@ after(() => {
 });
 
 // example functional tests of routes
-/*
+
+describe('GET /ui', () => {
+  it('responds with redirect', () => {
+    return request(server)
+      .get('/ui/')
+      .expect(302);
+  });
+});
+
 describe('GET /', () => {
-  it('responds with homepage', () => {
+  it('responds with not found page', () => {
     return request(server)
       .get('/')
       .expect('Content-Type', 'text/html; charset=UTF-8')
       .expect(200)
       .then(response => {
         expect(response.text).to.include(
-          'IBM Cloud - Node.js + Cloudant',
+          'Whoops! Looks like you got lost or couldn\'t find your page.',
         );
       });
   });
-});*/
+});
 
 describe('GET /health', () => {
   it('responds with json', () => {
@@ -73,24 +81,42 @@ describe('POST /fake/route', () => {
   });
 });
 
-// temporary suspend this test
-/*
-describe('POST /api/names', () => {
-  it('responds with created', () => {
+describe('POST /ui/api/names', () => {
+  it('responds with redirect', () => {
     return request(server)
-      .post('/api/names')
+      .post('/ui/api/names')
       .send({
         name: 'example',
         timestamp: '2020-11-04T17:53:09.589Z',
       })
-      .expect('Content-Type', 'application/json; charset=utf-8')
-      .expect(201);
+      // .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(302);
   });
 
-  it('responds with bad request', () => {
+  it('responds with bad redirect', () => {
     return request(server)
-      .post('/api/names')
-      .expect('Content-Type', 'application/json; charset=utf-8')
-      .expect(400);
+      .post('/ui/api/names')
+      // .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(302);
   });
-});*/
+});
+
+describe('POST /ui/api/patients', () => {
+  it('responds with redirect', () => {
+    return request(server)
+      .post('/ui/api/patients')
+      .send({
+        name: 'example',
+        timestamp: '2020-11-04T17:53:09.589Z',
+      })
+      // .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(302);
+  });
+
+  it('responds with bad redirect', () => {
+    return request(server)
+      .post('/ui/api/patients')
+      // .expect('Content-Type', 'application/json; charset=utf-8')
+      .expect(302);
+  });
+});

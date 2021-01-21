@@ -12,6 +12,7 @@ applications:
   - route: my-sample-app-test.eu-de.mybluemix.net  
   services:
     - my-cloudant-db-alias
+    - appid-for-my-sample-app
   env:
     OPTIMIZE_MEMORY: true
 

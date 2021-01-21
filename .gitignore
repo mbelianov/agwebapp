@@ -3,3 +3,4 @@ node_modules
 node_modules_linux
 .nyc_output
 server/localdev-config.json
+server/localdev-config-appid.json
