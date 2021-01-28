@@ -1,0 +1,21 @@
+// customize your style here
+
+$css--plex: true;
+
+@import 'node_modules/carbon-components/scss/components/detail-page-header/detail-page-header';
+@import 'node_modules/carbon-components/scss/components/data-table/data-table';
+@import 'node_modules/carbon-components/scss/components/notification/inline-notification';
+@import 'node_modules/carbon-components/scss/components/overflow-menu/overflow-menu';
+@import 'node_modules/carbon-components/scss/components/interior-left-nav/interior-left-nav';
+
+.bx--detail-page-header,
+.bx--interior-left-nav {
+ top: 0px;
+}
+
+.bx--responsive-table-container {
+
+ margin-left: 199px;
+ margin-top: 88px;
+
+}

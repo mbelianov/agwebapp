@@ -63,16 +63,20 @@ app.get('/logout', function(req, res){
 // protect the whole app
 // app.use(passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 
-// protect anything below /ui
+// protect anything below /ui and below /api
 app.use('/ui', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+app.use('/api', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 
 // access to static files
 app.use('/ui', express.static(path.join('public')));
+app.use('/public', express.static(path.join('public2')));     // public will remain open for public access
+app.use('/react', express.static(path.join('react-build')));   // react index.html
+app.use('/static', express.static(path.join('react-build/static')));
 
 // routes and api calls
 app.use('/health', healthRoutes);
-app.use('/ui/api/names', nameRoutes);
-app.use('/ui/api/patients', patientsRoutes);
+app.use('/api/names', nameRoutes);
+app.use('/api/patients', patientsRoutes);
 
 // start node server
 app.listen(port, () => {
