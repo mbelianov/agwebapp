@@ -31,7 +31,9 @@ exports.getPatients = (req, res, next) => {
       fetchedNames.rows.forEach(fetchedName => {
         names[row] = {
           _id: fetchedName.id,
-          name: fetchedName.doc.name,
+          firstname: fetchedName.doc.firstname,
+          secondname: fetchedName.doc.secondname,
+          lastname: fetchedName.doc.lastname,
           timestamp: fetchedName.doc.timestamp,
         };
         row = row + 1;
