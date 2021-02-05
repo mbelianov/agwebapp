@@ -38,13 +38,67 @@ exports.getPatients = (req, res, next) => {
         };
         row = row + 1;
       });
-      console.log('Get patients successful');
+      console.log('Get patients successful. total_rows: ', fetchedNames.total_rows);
       return res.status(200).json(names);
     })
     .catch(error => {
       console.log('Get patients failed');
       return res.status(500).json({
         message: 'Get patients failed.',
+        error: error,
+      });
+    });
+};
+
+
+// find patients from database
+exports.findPatient = (req, res, next) => {
+
+  const q = {
+    selector: {
+      egn: {
+        $gt: '',
+      },
+    },
+    sort: [
+      {
+        timestamp: 'asc',
+      },
+    ],
+    bookmark: null,
+    limit: 2,
+  };
+
+  console.log('In route - findPatients');
+  console.log('search: ', req.query.search);
+  console.log('bookmark: ', req.query.bookmark);
+
+  if (req.query.exact === 'true')
+    q['selector']['egn'] = {$eq: req.query.search};
+  else
+  if (req.query.search)
+    q['selector']['egn'] = {$gt: req.query.search};
+
+  if (req.query.bookmark)
+    q['bookmark'] = req.query.bookmark;
+
+  console.log('query: ', q);
+  return patients_db.find(q)
+    .then(fetchedNames => {
+      let row = 0;
+      fetchedNames.docs.forEach(doc => {
+        row++;
+      });
+      console.log('find patients successful!\nbookmark: ', fetchedNames.bookmark);
+      fetchedNames.count = row;
+      fetchedNames.requested = q.limit;
+      return res.status(200).json(fetchedNames);
+    })
+    .catch(error => {
+      console.log('Find patients failed');
+      q['bookmark'] = null;
+      return res.status(500).json({
+        message: 'Find patients failed.',
         error: error,
       });
     });
