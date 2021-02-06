@@ -20,7 +20,7 @@ const validate = validations => {
 };
 
 // define routes
-router.get('', PatientsController.getPatients);
+router.get('/list', PatientsController.getPatients);
 router.get('/find', PatientsController.findPatient);
 router.post('', validate([
   body('name').isAlphanumeric(),

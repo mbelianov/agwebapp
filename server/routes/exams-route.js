@@ -20,7 +20,7 @@ const validate = validations => {
 };
 
 // define routes
-router.get('', ExamsController.getExams);
+router.get('/list', ExamsController.getExams);
 router.get('/find', ExamsController.findExam);
 router.post('', validate([
   body('name').isAlphanumeric(),

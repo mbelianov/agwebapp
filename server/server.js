@@ -1,6 +1,6 @@
 // import dependencies and initialize express
 const express = require('express');
-// const log4js = require('log4js');
+const cors = require('cors');
 const session = require('express-session');                       // https://www.npmjs.com/package/express-session
 const passport = require('passport');                              // https://www.npmjs.com/package/passport
 const WebAppStrategy = require('ibmcloud-appid').WebAppStrategy;  // https://www.npmjs.com/package/ibmcloud-appid
@@ -67,6 +67,12 @@ app.get('/logout', function(req, res){
 // protect anything below /ui and below /api
 app.use('/ui', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 // app.use('/api', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+
+
+// allow CORS from anywhere
+// TODO: potential security concern
+app.options('*', cors());
+app.use(cors());
 
 // access to static files
 app.use('/ui', express.static(path.join('public')));
