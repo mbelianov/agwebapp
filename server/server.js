@@ -10,6 +10,7 @@ const helmet = require('helmet');
 const nameRoutes = require('./routes/names-route.js');
 const healthRoutes = require('./routes/health-route.js');
 const patientsRoutes = require('./routes/patients-route.js');
+const examsRoutes = require('./routes/exams-route.js');
 
 // import dependencies
 const IBMCloudEnv = require('ibm-cloud-env');
@@ -77,6 +78,7 @@ app.use('/static', express.static(path.join('react-build/static')));
 app.use('/health', healthRoutes);
 app.use('/api/names', nameRoutes);
 app.use('/api/patients', patientsRoutes);
+app.use('/api/exams', examsRoutes);
 
 // start node server
 app.listen(port, () => {
