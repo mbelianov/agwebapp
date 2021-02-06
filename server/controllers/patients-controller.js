@@ -53,10 +53,20 @@ exports.getPatients = (req, res, next) => {
 
 // find patients from database
 exports.findPatient = (req, res, next) => {
+  /**
+   * finds patient in DB by EGN
+   * @param exact [true|false] - if true exact match is used. otherwise
+   * the function return next 5 patients whose EGN is greater than search
+   * parameter
+   * @param search the EGN we are serching for
+   * @param bookmark the bookmark parameter allows us to continue seeaching
+   * from the place previous search has finished
+   * @return JSON with all found patients
+   */
 
   const q = {
     selector: {
-      egn: {
+      _id: {
         $gt: '',
       },
     },
@@ -66,7 +76,7 @@ exports.findPatient = (req, res, next) => {
       },
     ],
     bookmark: null,
-    limit: 2,
+    limit: 5,
   };
 
   console.log('In route - findPatients');
@@ -74,10 +84,10 @@ exports.findPatient = (req, res, next) => {
   console.log('bookmark: ', req.query.bookmark);
 
   if (req.query.exact === 'true')
-    q['selector']['egn'] = {$eq: req.query.search};
+    q['selector']['_id'] = {$eq: req.query.search};
   else
   if (req.query.search)
-    q['selector']['egn'] = {$gt: req.query.search};
+    q['selector']['_id'] = {$gt: req.query.search};
 
   if (req.query.bookmark)
     q['bookmark'] = req.query.bookmark;
