@@ -61,13 +61,14 @@ exports.findPatient = (req, res, next) => {
    * @param search the EGN we are serching for
    * @param bookmark the bookmark parameter allows us to continue seeaching
    * from the place previous search has finished
+   * @param pagesize defines how many items will be returned.
    * @return JSON with all found patients
    */
 
   const q = {
     selector: {
       _id: {
-        $gt: '',
+        $gte: '',
       },
     },
     sort: [
@@ -87,10 +88,13 @@ exports.findPatient = (req, res, next) => {
     q['selector']['_id'] = {$eq: req.query.search};
   else
   if (req.query.search)
-    q['selector']['_id'] = {$gt: req.query.search};
+    q['selector']['_id'] = {$gte: req.query.search};
 
   if (req.query.bookmark)
     q['bookmark'] = req.query.bookmark;
+
+  if (req.query.pagesize)
+    q['limit'] = parseInt(req.query.pagesize, 10);
 
   console.log('query: ', q);
   return patients_db.find(q)
