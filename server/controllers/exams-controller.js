@@ -64,9 +64,6 @@ exports.findExam = (req, res, next) => {
       },
     },
     sort: [
-      {
-        timestamp: 'asc',
-      },
     ],
     bookmark: null,
     limit: 5,
