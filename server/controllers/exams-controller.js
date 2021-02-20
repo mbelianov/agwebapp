@@ -24,7 +24,7 @@ const exams_db = cloudant.db.use('exams-db');
 // get exams from database
 exports.getExams = (req, res, next) => {
   console.log('In route - getExams');
-  return exams_db.list({include_docs: true})
+  return exams_db.list({ include_docs: true })
     .then(fetchedExams => {
       let exams = [];
       let row = 0;
@@ -45,7 +45,6 @@ exports.getExams = (req, res, next) => {
       });
     });
 };
-
 
 // find exam from database
 exports.findExam = (req, res, next) => {
@@ -74,7 +73,7 @@ exports.findExam = (req, res, next) => {
   console.log('bookmark: ', req.query.bookmark);
 
   if (req.query.search)
-    q['selector']['egn'] = {$eq: req.query.search};
+    q['selector']['egn'] = { $eq: req.query.search };
 
   if (req.query.bookmark)
     q['bookmark'] = req.query.bookmark;
@@ -123,5 +122,57 @@ exports.addExam = (req, res, next) => {
         message: 'Add exam failed.',
         error: error,
       });
+    });
+};
+
+
+exports.getPatientExamsAll = async(patientEgn) => {
+
+  const q = {
+    selector: {
+      egn: { $eq: patientEgn },
+    },
+    bookmark: null,
+    fields: ['_id', '_rev'],
+    limit: 1,
+  };
+
+  console.log('In function - getPatientExamsAll');
+
+  let exams = [];
+  let count = 0;
+
+  try {
+    do {
+      const fetchedExams = await exams_db.find(q);
+      count = 0;
+      fetchedExams.docs.forEach(exam => {
+        exams.push(exam);
+        count++;
+      });
+      q.bookmark = fetchedExams.bookmark;
+    } while (count === q.limit);
+
+  } catch (error) {
+    console.log('getPatientExamsAll failed. unable for fetch all exams.', error.error);
+  };
+
+  return exams;
+};
+
+exports.deletePatientExam = (exam) => {
+
+  console.log('trying to delete exam: ', exam);
+  // const response = await exams_db.destroy(exam._id, exam._rev);
+  exams_db.destroy(exam._id, exam._rev)
+    .then(response => {
+      console.log('success deleting exam: ', exam);
+      return (0);
+
+    })
+    .catch(error => {
+      console.log('error occured: ', error.error);
+      return (error.error);
+
     });
 };

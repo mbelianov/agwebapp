@@ -22,6 +22,7 @@ const validate = validations => {
 // define routes
 router.get('/list', PatientsController.getPatients);
 router.get('/find', PatientsController.findPatient);
+router.get('/delete', PatientsController.deletePatient);
 router.post('', validate([
   body('name').isAlphanumeric(),
   body('timestamp').isISO8601(),

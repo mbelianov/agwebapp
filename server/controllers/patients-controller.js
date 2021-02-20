@@ -1,5 +1,7 @@
 // import dependencies
 const IBMCloudEnv = require('ibm-cloud-env');
+const ExamsController = require('./exams-controller');
+
 IBMCloudEnv.init('/server/config/mappings.json');
 
 // initialize Cloudant
@@ -24,7 +26,7 @@ const patients_db = cloudant.db.use('patients-db');
 // get names from database
 exports.getPatients = (req, res, next) => {
   console.log('In route - getPatients');
-  return patients_db.list({include_docs: true})
+  return patients_db.list({ include_docs: true })
     .then(fetchedNames => {
       let names = [];
       let row = 0;
@@ -49,7 +51,6 @@ exports.getPatients = (req, res, next) => {
       });
     });
 };
-
 
 // find patients from database
 exports.findPatient = (req, res, next) => {
@@ -85,10 +86,10 @@ exports.findPatient = (req, res, next) => {
   console.log('bookmark: ', req.query.bookmark);
 
   if (req.query.exact === 'true')
-    q['selector']['_id'] = {$eq: req.query.search};
+    q['selector']['_id'] = { $eq: req.query.search };
   else
   if (req.query.search)
-    q['selector']['_id'] = {$gte: req.query.search};
+    q['selector']['_id'] = { $gte: req.query.search };
 
   if (req.query.bookmark)
     q['bookmark'] = req.query.bookmark;
@@ -140,5 +141,62 @@ exports.addPatient = (req, res, next) => {
         message: 'Add patient failed.',
         error: error,
       });
+    });
+};
+
+
+exports.deletePatient = (req, res, next) => {
+  /**
+   * deletes the patent document from the db. also deletes all associated exams
+   * @param id the _id of the pattient document
+   * @return JSON with detailes from the delete operation
+   */
+
+  console.log('In route - deletePatients');
+  if (req.query.id == null) {
+    console.log('patient id not specified. Nothing to delete.');
+    return res.status(200).json({
+      message: 'patient id not specified. Nothing to delete.',
+    });
+  }
+  patients_db.get(req.query.id, { revs_info: true })
+    .then(async(doc) => {
+      console.log(doc._id, doc._rev, doc.egn);
+      const exams = await ExamsController.getPatientExamsAll(doc.egn);
+      console.log('Fond these exams: ', exams);
+      exams.forEach(exam => {
+        ExamsController.deletePatientExam(exam);
+      });
+
+      console.log('trying to delete patient', doc);
+      patients_db.destroy(doc._id, doc._rev)
+        .then(response => {
+          console.log('success deleting patient: ', doc);
+          return (res.status(200).json(doc));
+
+        })
+        .catch(error => {
+          console.log('error occured: ', error.error);
+          return res.status(200).json({
+            message: 'Error occured.',
+            error: error,
+          });
+        });
+    })
+    .catch(error => {
+      if (error.message === 'missing') {
+        console.log('Patient not found. Nothing to delete.');
+        return res.status(200).json({message: 'Patient not found. Nothing to delete.'});
+      }
+      if (error.message === 'deleted') {
+        console.log('Patient already deleted.');
+        return res.status(200).json({message: 'Patient already deleted.'});
+      } else {
+        console.log('Error occured:', error);
+        return res.status(200).json({
+          message: 'Error occured.',
+          error: error,
+        });
+      }
     });
 };
