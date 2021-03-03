@@ -120,28 +120,45 @@ exports.findPatient = (req, res, next) => {
 };
 
 // add name to database
-exports.addPatient = (req, res, next) => {
+/**
+   * add or update patient personal data in the database
+   *
+   * @body JSON object with patient personal data
+   * @return JSON with detailes from the db.insert operation
+   */
+exports.addPatient = async(req, res, next) => {
   console.log('In route - addPatient');
-  let name = {
-    name: req.body.name,
-    timestamp: req.body.timestamp,
-  };
+
+  let name = {...req.body, timestamp: new Date().toISOString()};
+
+  // return res.status(201).json({name});
+
+  console.log('check if patient already exist');
+  const found = await patients_db.get(req.body._id, {revs_info: true })
+    .catch(error => {
+      console.log('error, may be does not exist: ', error); // just log the error
+    });
+
+  if (found){
+    console.log('found: ', found);
+    name = {...name, _rev: found._rev};
+  }
+
+  console.log('add/update: ', name);
   return patients_db.insert(name)
     .then(addedName => {
       console.log('Add patient successful');
-      return res.status(201).json({
-        _id: addedName.id,
-        name: addedName.name,
-        timestamp: addedName.timestamp,
-      });
+      console.log(addedName);
+      return res.status(201).json({addedName});
     })
     .catch(error => {
-      console.log('Add patient failed');
+      console.log('Add/update patient failed with following error: ', error);
       return res.status(500).json({
-        message: 'Add patient failed.',
+        message: 'Add/update patient failed.',
         error: error,
       });
     });
+
 };
 
 
@@ -163,7 +180,7 @@ exports.deletePatient = (req, res, next) => {
     .then(async(doc) => {
       console.log(doc._id, doc._rev, doc.egn);
       const exams = await ExamsController.getPatientExamsAll(doc.egn);
-      console.log('Fond these exams: ', exams);
+      console.log('Found these exams: ', exams);
       exams.forEach(exam => {
         ExamsController.deletePatientExam(exam);
       });

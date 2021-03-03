@@ -7,6 +7,7 @@ const router = express.Router();
 
 // standardized validation error response
 const validate = validations => {
+
   return async(req, res, next) => {
     await Promise.all(validations.map(validation => validation.run(req)));
 
@@ -14,8 +15,8 @@ const validate = validations => {
     if (errors.isEmpty()) {
       return next();
     }
-
-    res.status(400).json({ errors: errors.array() });
+    console.log('validation_errors: ', errors.array());
+    res.status(400).json({ validation_errors: errors.array() });
   };
 };
 
@@ -23,9 +24,14 @@ const validate = validations => {
 router.get('/list', PatientsController.getPatients);
 router.get('/find', PatientsController.findPatient);
 router.get('/delete', PatientsController.deletePatient);
-router.post('', validate([
-  body('name').isAlphanumeric(),
-  body('timestamp').isISO8601(),
+router.post('/add', validate([
+  body('firstname').isAlpha('bg-BG'),
+  body('secondname').isAlpha('bg-BG'),
+  body('lastname').isAlpha('bg-BG'),
+  body('egn').isNumeric({no_symbols: true}),
+  body('email').isEmail(),
+  body('telephone').isMobilePhone(),
+  // body('timestamp').isISO8601(),
 ]), PatientsController.addPatient);
 
 module.exports = router;
