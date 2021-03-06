@@ -25,13 +25,12 @@ router.get('/list', PatientsController.getPatients);
 router.get('/find', PatientsController.findPatient);
 router.get('/delete', PatientsController.deletePatient);
 router.post('/add', validate([
-  body('firstname').isAlpha('bg-BG'),
-  body('secondname').isAlpha('bg-BG'),
-  body('lastname').isAlpha('bg-BG'),
+  body('firstname').not().isEmpty(),
+  body('secondname').not().isEmpty(),
+  body('lastname').not().isEmpty(),
   body('egn').isNumeric({no_symbols: true}),
   body('email').isEmail(),
   body('telephone').isMobilePhone(),
-  // body('timestamp').isISO8601(),
 ]), PatientsController.addPatient);
 
 module.exports = router;
