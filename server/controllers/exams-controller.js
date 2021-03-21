@@ -58,22 +58,19 @@ exports.findExam = (req, res, next) => {
 
   const q = {
     selector: {
-      egn: {
-        $eq: '',
-      },
+      'patient.patientEGN': {$eq: ''},
     },
-    sort: [
-    ],
+    sort: ['timestamp'],
     bookmark: null,
     limit: 5,
   };
 
   console.log('In route - findExam');
   console.log('search: ', req.query.search);
-  console.log('bookmark: ', req.query.bookmark);
 
   if (req.query.search)
-    q['selector']['egn'] = { $eq: req.query.search };
+    q['selector']['patient.patientEGN'] = { $eq: req.query.search };
+
 
   if (req.query.bookmark)
     q['bookmark'] = req.query.bookmark;
@@ -100,24 +97,52 @@ exports.findExam = (req, res, next) => {
     });
 };
 
-// add name to database
-exports.addExam = (req, res, next) => {
+// add exam to database
+exports.addExam = async(req, res, next) => {
+
   console.log('In route - addExam');
-  let exam = {
-    name: req.body.name,
-    timestamp: req.body.timestamp,
+
+  console.log('check if exam exist');
+  let newExam = req.body;
+  let examToUpdate;
+
+  const q = {
+    selector: {
+      $and: [
+        { 'patient.patientEGN': {$eq: newExam.patient.patientEGN}},
+        { examId: {$eq: newExam.examId}},
+        { timestamp: {$eq: newExam.timestamp}},
+      ],
+    },
+    limit: 2,
   };
-  return exams_db.insert(exam)
+
+  try {
+    const response = await exams_db.find(q);
+    if (response.docs.length === 2){
+      console.warn('Exam table is inconsistent.');
+      console.warn('There are 2 or more exams with same {examId, patientEGN and timestamp}: ',
+        newExam.examId, newExam.patient.patientEGN, newExam.timestamp);
+    }
+    if (response.docs[0])
+      examToUpdate = response.docs[0];
+
+  } catch (e){
+    console.log('error. will try to recover: ', e);
+  }
+  if (examToUpdate) {
+    console.log('will update existing exam: ', examToUpdate);
+    newExam._id = examToUpdate._id;
+    newExam._rev = examToUpdate._rev;
+  }
+
+  return exams_db.insert(newExam)
     .then(addedExam => {
-      console.log('Add exam successful');
-      return res.status(201).json({
-        _id: addedExam.id,
-        name: addedExam.name,
-        timestamp: addedExam.timestamp,
-      });
+      console.log('Add exam successful: ', addedExam);
+      return res.status(201).json({...addedExam});
     })
     .catch(error => {
-      console.log('Add exam failed');
+      console.log('Add exam failed: ', error);
       return res.status(500).json({
         message: 'Add exam failed.',
         error: error,
