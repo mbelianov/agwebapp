@@ -60,7 +60,7 @@ exports.findExam = (req, res, next) => {
     selector: {
       'patient.patientEGN': {$eq: ''},
     },
-    sort: ['timestamp'],
+    sort: [{timestamp: 'desc'}],
     bookmark: null,
     limit: 5,
   };
