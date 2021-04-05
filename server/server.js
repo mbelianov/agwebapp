@@ -66,7 +66,8 @@ app.get('/logout', function(req, res){
 
 // protect anything below /ui and below /api
 app.use('/ui', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
-// app.use('/api', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+app.use('/react', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+app.use('/api', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 
 
 // allow CORS from anywhere
