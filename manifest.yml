@@ -8,11 +8,9 @@ applications:
   command: npm start
   disk_quota: 1G
   memory: 128MB
-  routes:
-  - route: my-sample-app-test.eu-de.mybluemix.net  
   services:
-    - my-cloudant-db-alias
-    - appid-for-my-sample-app
+    - arabadjikova-agdb
+    - arabadjikova-app-id
   env:
     OPTIMIZE_MEMORY: true
 
