@@ -147,7 +147,7 @@ exports.addPatient = async(req, res, next) => {
   console.log('add/update: ', name);
   return patients_db.insert(name)
     .then(addedName => {
-      console.log('Add patient successful');
+      console.log('Add/update patient successful');
       console.log(addedName);
       return res.status(201).json({addedName});
     })

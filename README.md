@@ -1,115 +1,157 @@
-<p align="center">
-    <a href="https://cloud.ibm.com">
-        <img src="https://cloud.ibm.com/media/docs/developer-appservice/resources/ibm-cloud.svg" height="100" alt="IBM Cloud">
-    </a>
-</p>
 
-<p align="center">
-    <a href="https://cloud.ibm.com">
+<p >
     <img src="https://img.shields.io/badge/IBM%20Cloud-powered-blue.svg" alt="IBM Cloud">
-    </a>
     <img src="https://img.shields.io/badge/platform-node-lightgrey.svg?style=flat" alt="platform">
     <img src="https://img.shields.io/badge/license-Apache2-blue.svg?style=flat" alt="Apache 2">
 </p>
 
 
-# Create and deploy a Node.js + Cloudant application
+# 1. Deploying to IBM Cloud
+1. Create Cloud Foundry organization and space e.g. `AG` & `prod` 
+2. Choose a name and create Cloud Foundry app in the created space e.g. `webapp`
+3. Create second instance in the same CF space that will be used for preview purposes when you deploy new features. e.g. `webapp-preview`
+4. Create CloudantDB e.g. `mydb`. When creating the CloudantDB chose combined "IAM and Legacy Credentials" authentication mechanism.
+5. Open `mydb` dashboard and created two databases - `patients-db` and `exams-db`. Use exactly those names.
+6. Create following query indexes:
+   1. In `patients-db`:
 
-In this sample application, you will create a basic web application using Express to serve web pages in Node.js integrated complete with standard best practices, including a health check and application metric monitoring. In addition, this sample includes integration with Cloudant, a fully managed JSON document database.
+        ```json
+        {
+            "index": {
+                "fields": [
+                    "timestamp"
+                ]},
+            "name": "timestamp-json-index",
+            "type":"json"
+        }
+        ```
+    2. In `exams-db`:
+        
+        ```json
+        {
+            "index": {
+                "fields": [
+                    "timestamp"
+                ]},
+            "name": "timestamp-json-index",
+            "type":"json"
+        }
+        ```
 
-You can access the cloud native microservice capabilities at the following endpoints:
-- Health endpoint: `/health`
+        ```json
+        {
+            "index": {
+                "fields": [
+                    "patient.patientEGN"
+                    ]},
+            "name": "egn-json-index",
+            "type":"json"
+        }
+        ```
+        
+        ```json
+        {
+            "index": {
+                "fields": [
+                    "examId"
+                ]},
+            "name": "examId-json-index",
+            "type":"json"
+        }
+        ```
+7. Create 'Service Credentials' for your CloudantDB. Credantials of this Service Instance will be used by your development server to access the DB when you develop new features. Choose appropriate name of the Service Instance e.g. `OnPrem Access for CloudantDB`
+8. Chose a name and create App Id instance for your app e.g. `webapp-appid`
+9. Similarly create 'Service Credentials' for on-prem access for your dev server.
+10. Create new 'regularwebapp' application (from AppId point of view that would be an OAuth Client) in your newly created AppId instance.
+11. Add Web Redirect URLs for your application. Web Redirect URLs is composed as `http://appurl/callback`. You can check your appurl from your the Cloud Foundry console page of your app. It should look something like `http://webapp.eu-de.mybluemix.net`
+12. From the Cloud Foundry console page of your apps (`webapp` and `webapp-preview`) create Connections to both `webapp-appid` and `mydb` instances.
+13. Create empty devops toolchain. Give it a name you want.
+14. Add GitHub integration and link it to this repository
+15. Add Classic Delivery Pipeline integration.
+    1.  Create API key for your account and provide this key to the Delivery Pipeline.
+        1.  Open the Delivery Pipeline tile, click on Actions->Configure Pipeline, add Environment Variable with a nme API_KEY and paste the API key you created.
+    2.  Add Build stage and two Deploy stages. The first Deploy stage will delpoy the preview app, the second Deploy stage will deploy the production app. Configure the second deploy stage to run manually
+    3.  Configure the Build stage: 
+        1.  in the Input tab, make a link to this GithHub repo, select branch
+        2.  In the Jobs tab, add a build job, select type "Shell Script"
+    4.  Configure the Deploy Preview stage
+        1.  In the Input tab, select "Build artefacts" 
+        2.  In the Jobs tab, select deployer type -> Cloud Foundry, cloud foundry type -> IBM Public Cloud, API_KYE->the key you created
+        3.  select region, organization and space
+        4.  give a name `webapp-preview`
+        5.  Paste following code in the script window
+            ```bash
+            #!/bin/bash
+            #Push app
+            if ! cf app "$CF_APP"; then  
+                cf push "$CF_APP"
+            else
+                 OLD_CF_APP="${CF_APP}-OLD-$(date +"%s")"
+                 rollback() {
+                    set +e  
+                    if cf app "$OLD_CF_APP"; then
+                        cf logs "$CF_APP" --recent
+                        cf delete "$CF_APP" -f
+                        cf rename "$OLD_CF_APP" "$CF_APP"
+                    fi
+                    exit 1
+                }
+                set -e
+                trap rollback ERR
+                cf rename "$CF_APP" "$OLD_CF_APP"
+                cf push "$CF_APP"
+                cf delete "$OLD_CF_APP" -f
+            fi
 
-## Steps
+            # Export app name and URL for use in later Pipeline jobs
+            export CF_APP_NAME="$CF_APP"
+            export APP_URL=http://$(cf app $CF_APP_NAME | grep -e urls: -e routes: | awk '{print $2}')
+            
+            # View logs
+            #cf logs "${CF_APP}" --recent
 
-You can [deploy this application to IBM Cloud](https://cloud.ibm.com/developer/appservice/starter-kits/nodejs-+-cloudant) or [build it locally](#building-locally) by cloning this repo first. Once your app is live, you can access the `/health` endpoint to build out your cloud native application.
+            EXIT=$?
+            if [ $EXIT -eq 0 ]; then STATUS=pass; else STATUS=fail; fi;
+            ```
+    5.  Conifgure Deploy stage in similar maner.
+    6.  Optionally attach tags to the newly created apps with following command.
+        ```bash
+        ibmcloud login --apikey $API_KEY --no-region
+        ibmcloud resource tag-attach --tag-names $TAGS --resource-name "$CF_APP"
+        ```
+16.  Optionally add DevOps Insight and Slack integration.
+17.  Start the pipeline and monitor app deployment through `view logs and history` links of eac stage.
 
-### Deploying to IBM Cloud
 
-<p align="center">
-    <a href="https://cloud.ibm.com/developer/appservice/starter-kits/nodejs-+-cloudant">
-    <img src="https://cloud.ibm.com/devops/setup/deploy/button_x2.png" alt="Deploy to IBM Cloud">
-    </a>
-</p>
+# 2. Server API description
 
-Click **Deploy to IBM Cloud** to deploy this same application to IBM Cloud. This option creates a deployment pipeline, complete with a hosted GitLab project and a DevOps toolchain. You can deploy your app to Cloud Foundry, a Kubernetes cluster, or a Red Hat OpenShift cluster. OpenShift is available only through a standard cluster, which requires you to have a billable account.
+All operations must be authorised through AppID instance of IBM Cloud.
 
-[IBM Cloud DevOps](https://www.ibm.com/cloud/devops) services provides toolchains as a set of tool integrations that support development, deployment, and operations tasks inside IBM Cloud.
+### Patient API:
+|Operation|Description|
+|---|---|
+|GET /api/patients/list|List all patients in the databse|
+|GET /api/patients/find?search=`patientEGN`&pagesize=`pagesize`&bookmark=`bookmark`&exact=`true\|false`|Finds all patients the DB whose EGN is greater or equal to `patientEGN`<br/> If `exact` equals true, only exact match is found. `pagesize` defines how many patients will be reaturned in each API call. The response will containt also `bookmark` which  allows to continue searching from the place previous search has finished.|
+|GET /api/patients/delete?id=`id`|Deletes patient from the database togather will all associated exams for that patient. `id` is the document id of the record in the cloudant DB (currently it is same as patient EGN)|
+|POST /api/patients/add| Adds or updates patient personal data. The `body` of the POST request must contain properly formatted Cloudant JSON document that passes following validations: <pre>body('firstname').not().isEmpty()<br/>body('secondname').not().isEmpty()<br/>body('lastname').not().isEmpty()<br/>body('egn').isNumeric({no_symbols: true})<br/>body('email').isEmail()<br/>body('telephone').isMobilePhone()</pre>
 
-### Building locally
 
-To get started building this application locally, you can either run the application natively or use the [IBM Cloud Developer Tools](https://cloud.ibm.com/docs/cli?topic=cloud-cli-getting-started) for containerization and easy deployment to IBM Cloud.
+### Exam API:
+|Operation|Description|
+|---|---|
+|GET /api/exams/list|List all axams in the databse|
+|GET /api/exams/find?search=`patientEGN`&bookmark=`bookmark`|Finds the next exam associated with the supplied `patientEGN`. The response conatins a `bookmark` which  allows to continue searching from the place previous search has finished.|
+|POST /api/exams/add| Adds new exam document in the databse. The `body` of the POST request must contain properly formatted Cloudant JSON document that passes following validations: <pre>body('patient.patientEGN').isNumeric({no_symbols: true})<br/>body('timestamp').not().isEmpty()<br/>body('examId').not().isEmpty()</pre>
 
-#### Native application development
 
-- Install the latest [Node.js](https://nodejs.org/en/download/) 12+ LTS version.
 
-Once the Node toolchain has been installed, you can download the project dependencies with:
 
-```bash
-npm install
-```
-
-To run your application locally:
-
-```bash
-npm run start
-```
-
-Your application will be running at `http://localhost:3000`.  You can access the `/health` endpoint at the host. You can also verify the state of your locally running application using the Selenium UI test script included in the `scripts` directory.
-
-#### IBM Cloud Developer Tools
-
-Install [IBM Cloud Developer Tools](https://cloud.ibm.com/docs/cli?topic=cloud-cli-getting-started) on your machine by running the following command:
-```
-curl -sL https://ibm.biz/idt-installer | bash
-```
-
-Create an application on IBM Cloud by running:
-
-```bash
-ibmcloud dev create
-```
-
-This will create and download a starter application with the necessary files needed for local development and deployment.
-
-Your application will be compiled with Docker containers. To compile and run your app, run:
-
-```bash
-ibmcloud dev build
-ibmcloud dev run
-```
-
-This will launch your application locally. When you are ready to deploy to IBM Cloud on Cloud Foundry or Kubernetes, run one of the following commands:
-
-```bash
-ibmcloud dev deploy -t buildpack // to Cloud Foundry
-ibmcloud dev deploy -t container // to K8s cluster
-```
-
-You can build and debug your app locally with:
-
-```bash
-ibmcloud dev build --debug
-ibmcloud dev debug
-```
-
-## Testing, linting, and code coverage
-
-### Running tests and code coverage
-
-To run tests and code coverage, run `npm run test`. A `coverage` folder will be created with code coverage results that can be reviewed for gaps. The code coverage thresholds are also defined in `package.json` under `nyc` and can be adjusted if needed. Also, you can use the script `npm run fix` to automatically fix linting problems.
-
-### Pre-commit hooks
-
-By default, a [Husky](https://github.com/typicode/husky) pre-commit hook is defined in `package.json`, which runs linting, testing, and code coverage before the commit is made. If either the linting, testing, or code coverage fails, the pre-commit hook prevents the changes from being committed. Review the results and fix the problems, or modify the thresholds to allow the commit to succeed.
 
 ## Next steps
-* Learn more about augmenting your Node.js applications on IBM Cloud with the [Node Programming Guide](https://cloud.ibm.com/docs/node?topic=nodejs-getting-started).
-* Explore other [sample applications](https://cloud.ibm.com/developer/appservice/starter-kits) on IBM Cloud.
+Deploy to Code Engine.
 
 ## License
 
-This sample application is licensed under the Apache License, Version 2. Separate third-party code objects invoked within this code pattern are licensed by their respective providers pursuant to their own separate licenses. Contributions are subject to the [Developer Certificate of Origin, Version 1.1](https://developercertificate.org/) and the [Apache License, Version 2](https://www.apache.org/licenses/LICENSE-2.0.txt).
+This sample application is licensed under the Apache License, Version 2. Separate third-party code objects invoked within this code pattern are licensed by their respective providers pursuant to their own separate licenses.
 
 [Apache License FAQ](https://www.apache.org/foundation/license-faq.html#WhatDoesItMEAN)
