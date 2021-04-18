@@ -10,105 +10,105 @@
   "cloudant_url": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.url",
-      "env:config:$cloudant.url",
+      "env:config:$.cloudant.url",
       "file:/server/localdev-config.json:$.cloudant.url"
     ]
   },
   "cloudant_apikey": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.apikey",
-      "env:config:$cloudant.apikey",
+      "env:config:$.cloudant.apikey",
       "file:/server/localdev-config.json:$.cloudant.apikey"
     ]
   },
   "cloudant_host": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.host",
-      "env:config:$cloudant.host",
+      "env:config:$.cloudant.host",
       "file:/server/localdev-config.json:$.cloudant.host"
     ]
   },
   "cloudant_iam_apikey_description": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.iam_apikey_description",
-      "env:config:$cloudant.iam_apikey_description",
+      "env:config:$.cloudant.iam_apikey_description",
       "file:/server/localdev-config.json:$.cloudant.iam_apikey_description"
     ]
   },
   "cloudant_iam_apikey_name": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.iam_apikey_name",
-      "env:config:$cloudant.iam_apikey_name",
+      "env:config:$.cloudant.iam_apikey_name",
       "file:/server/localdev-config.json:$.cloudant.iam_apikey_name"
     ]
   },
   "cloudant_iam_role_crn": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.iam_role_crn",
-      "env:config:$cloudant.iam_role_crn",
+      "env:config:$.cloudant.iam_role_crn",
       "file:/server/localdev-config.json:$.cloudant.iam_role_crn"
     ]
   },
   "cloudant_iam_serviceid_crn": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.iam_serviceid_crn",
-      "env:config:$cloudant.iam_serviceid_crn",
+      "env:config:$.cloudant.iam_serviceid_crn",
       "file:/server/localdev-config.json:$.cloudant.iam_serviceid_crn"
     ]
   },
   "cloudant_password": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.password",
-      "env:config:$cloudant.password",
+      "env:config:$.cloudant.password",
       "file:/server/localdev-config.json:$.cloudant.password"
     ]
   },
   "cloudant_port": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.port",
-      "env:config:$cloudant.port",
+      "env:config:$.cloudant.port",
       "file:/server/localdev-config.json:$.cloudant.port"
     ]
   },
   "cloudant_username": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.username",
-      "env:config:$cloudant.username",
+      "env:config:$.cloudant.username",
       "file:/server/localdev-config.json:$.cloudant.username"
     ]
   },
   "cloudant_serviceInfo": {
     "searchPatterns": [
       "cloudfoundry:$['cloudantNoSQLDB'][0].credentials.serviceInfo",
-      "env:config:$cloudant.serviceInfo",
+      "env:config:$.cloudant.serviceInfo",
       "file:/server/localdev-config.json:$.cloudant.serviceInfo"
     ]
   },
   "appid_clientId": {
     "searchPatterns": [
       "cloudfoundry:$['AppID'][0].credentials.clientId",
-      "env:config:$appid.clientId",
+      "env:config:$.appid.clientId",
       "file:/server/localdev-config.json:$.appid.clientId"
     ]
   },
   "appid_oauthServerUrl": {
     "searchPatterns": [
       "cloudfoundry:$['AppID'][0].credentials.oauthServerUrl",
-      "env:config:$appid.oauthServerUrl",
+      "env:config:$.appid.oauthServerUrl",
       "file:/server/localdev-config.json:$.appid.oauthServerUrl"
     ]
   },
   "appid_profilesUrl": {
     "searchPatterns": [
       "cloudfoundry:$['AppID'][0].credentials.profilesUrl",
-      "env:config:$appid.profilesUrl",
+      "env:config:$.appid.profilesUrl",
       "file:/server/localdev-config.json:$.appid.profilesUrl"
     ]
   },
   "appid_secret": {
     "searchPatterns": [
       "cloudfoundry:$['AppID'][0].credentials.secret",
-      "env:config:$appid.secret",
+      "env:config:$.appid.secret",
       "file:/server/localdev-config.json:$.appid.secret"
     ]
   }
@@ -116,7 +116,7 @@
   "appid_tenantId": {
     "searchPatterns": [
       "cloudfoundry:$['AppID'][0].credentials.tenantId",
-      "env:config:$appid.tenantId",
+      "env:config:$.appid.tenantId",
       "file:/server/localdev-config.json:$.appid.tenantId"
     ]
   }
