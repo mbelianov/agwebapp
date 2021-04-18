@@ -13,26 +13,6 @@
     "fix": "eslint --ignore-path .gitignore --ignore-pattern \"react-build/\" . --fix",
     "test": "nyc mocha test --recursive --exit"
   },
-  "_husky": {
-    "hooks": {
-      "pre-commit": "npm run lint && npm run test"
-    }
-  },
-  "_nyc": {
-    "check-coverage": false,
-    "per-file": true,
-    "lines": 80,
-    "statements": 80,
-    "functions": 80,
-    "branches": 80,
-    "exclude": [
-      "test"
-    ],
-    "reporter": [
-      "lcov",
-      "text-summary"
-    ]
-  },
   "dependencies": {
     "@cloudant/cloudant": "^4.3.0",
     "body-parser": "^1.19.0",

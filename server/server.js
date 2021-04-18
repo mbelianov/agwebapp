@@ -7,7 +7,6 @@ const WebAppStrategy = require('ibmcloud-appid').WebAppStrategy;  // https://www
 const path = require('path');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const nameRoutes = require('./routes/names-route.js');
 const healthRoutes = require('./routes/health-route.js');
 const patientsRoutes = require('./routes/patients-route.js');
 const examsRoutes = require('./routes/exams-route.js');
@@ -34,10 +33,10 @@ app.use(passport.session());
 passport.serializeUser((user, cb) => cb(null, user));
 passport.deserializeUser((user, cb) => cb(null, user));
 passport.use(new WebAppStrategy({
-  tenantId: IBMCloudEnv.getString('appid_tenantId'),              // 'a9d99b22-502c-4d9d-bbeb-41fd76bbc4ba',
-  clientId: IBMCloudEnv.getString('appid_clientId'),              // 'cbf8993b-8cb8-47c6-a8ba-bb74ff6d7942',
+  tenantId: IBMCloudEnv.getString('appid_tenantId'),              
+  clientId: IBMCloudEnv.getString('appid_clientId'),              
   secret: IBMCloudEnv.getString('appid_secret'),
-  oauthServerUrl: IBMCloudEnv.getString('appid_oauthServerUrl'),          // 'https://eu-de.appid.cloud.ibm.com/oauth/v4/a9d99b22-502c-4d9d-bbeb-41fd76bbc4ba',
+  oauthServerUrl: IBMCloudEnv.getString('appid_oauthServerUrl'),          
   redirectUri: 'http://' + IBMCloudEnv.getString('app_uri') + callbackPath,   // 'http://localhost:3000/callback',
 }));
 
@@ -76,14 +75,13 @@ app.options('*', cors());
 app.use(cors());
 
 // access to static files
-app.use('/ui', express.static(path.join('public')));
+app.use('/ui', express.static(path.join('react-build')));
 app.use('/public', express.static(path.join('public2')));     // public will remain open for public access
 app.use('/react', express.static(path.join('react-build')));   // react index.html
 app.use('/static', express.static(path.join('react-build/static')));
 
 // routes and api calls
 app.use('/health', healthRoutes);
-app.use('/api/names', nameRoutes);
 app.use('/api/patients', patientsRoutes);
 app.use('/api/exams', examsRoutes);
 
