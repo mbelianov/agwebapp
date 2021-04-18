@@ -3,7 +3,7 @@
   "app_uri": {
     "searchPatterns": [
       "cloudfoundry:$.application_uris[0]",
-      "env:HOSTNAME",
+      "env:APP_URI",
       "file:/server/localdev-config.json:$.vcap_application.uri"
     ]
   },
