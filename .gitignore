@@ -5,3 +5,4 @@ node_modules_linux
 server/localdev-config.json
 server/localdev-config-appid.json
 devnotes.txt
+apikey.json
