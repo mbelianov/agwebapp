@@ -67,6 +67,7 @@ app.get('/logout', function(req, res){
 app.use('/ui', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 app.use('/react', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 app.use('/api', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+app.use('/tokens', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 
 
 // allow CORS from anywhere
@@ -84,6 +85,9 @@ app.use('/static', express.static(path.join('react-build/static')));
 app.use('/health', healthRoutes);
 app.use('/api/patients', patientsRoutes);
 app.use('/api/exams', examsRoutes);
+app.use('/tokens', (req, res)=>{
+  res.json(req.session.APPID_AUTH_CONTEXT);
+});
 
 // start node server
 app.listen(port, () => {
