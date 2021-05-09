@@ -4,6 +4,7 @@ const cors = require('cors');
 const session = require('express-session');                       // https://www.npmjs.com/package/express-session
 const passport = require('passport');                              // https://www.npmjs.com/package/passport
 const WebAppStrategy = require('ibmcloud-appid').WebAppStrategy;  // https://www.npmjs.com/package/ibmcloud-appid
+const APIStrategy = require("ibmcloud-appid").APIStrategy;
 const path = require('path');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
@@ -19,7 +20,7 @@ IBMCloudEnv.init('/server/config/mappings.json');
 const port = process.env.PORT || 3000;
 
 // define callback path
-const callbackPath = '/callback';
+const callbackPath = IBMCloudEnv.getString('callback_path');
 
 const app = express();
 // const logger = log4js.getLogger("my-sample-app");
@@ -40,6 +41,10 @@ passport.use(new WebAppStrategy({
   redirectUri: 'http://' + IBMCloudEnv.getString('app_uri') + callbackPath,   // 'http://localhost:3000/callback',
 }));
 
+passport.use(new APIStrategy({
+  oauthServerUrl: IBMCloudEnv.getString('appid_oauthServerUrl')
+}));
+
 // enable parsing of http request body
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -52,7 +57,7 @@ if (process.env.VCAP_APPLICATION) {
 }
 
 // handle callback
-app.get('/callback', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+app.get(callbackPath, passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 
 // handle logout
 app.get('/logout', function(req, res){
@@ -60,34 +65,45 @@ app.get('/logout', function(req, res){
   res.redirect('/ui');
 });
 
-// protect the whole app
-// app.use(passport.authenticate(WebAppStrategy.STRATEGY_NAME));
-
-// protect anything below /ui and below /api
-app.use('/ui', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
-app.use('/react', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
-app.use('/api', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
-app.use('/tokens', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
-
-
 // allow CORS from anywhere
 // TODO: potential security concern
 app.options('*', cors());
 app.use(cors());
 
+// protect the whole app
+// app.use(passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+
+// protect anything below /ui and below /api
+app.use('/login', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+app.use('/ui', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+app.use('/api', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+app.use('/tokens', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+app.use('/api-v2', passport.authenticate(APIStrategy.STRATEGY_NAME, {session: false}));
+
+
+
+
 // access to static files
 app.use('/ui', express.static(path.join('react-build')));
 app.use('/public', express.static(path.join('public2')));     // public will remain open for public access
-app.use('/react', express.static(path.join('react-build')));   // react index.html
 app.use('/static', express.static(path.join('react-build/static')));
 
 // routes and api calls
 app.use('/health', healthRoutes);
 app.use('/api/patients', patientsRoutes);
 app.use('/api/exams', examsRoutes);
+app.use('/api-v2/patients', patientsRoutes);
+app.use('/api-v2/exams', examsRoutes);
 app.use('/tokens', (req, res)=>{
   res.json(req.session.APPID_AUTH_CONTEXT);
 });
+
+app.get('/api-v2/whoami',
+  (req, res)=>{
+    var username = req.user.name || "Anonymous";
+    res.send("Hello from protected resource " + username);
+  }
+);
 
 // start node server
 app.listen(port, () => {
