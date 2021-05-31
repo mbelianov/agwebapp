@@ -75,7 +75,7 @@ app.use(cors());
 
 // protect anything below /ui and below /api
 app.use('/login', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
-app.use('/ui', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
+//app.use('/ui', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 app.use('/api', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 app.use('/tokens', passport.authenticate(WebAppStrategy.STRATEGY_NAME));
 app.use('/api-v2', passport.authenticate(APIStrategy.STRATEGY_NAME, {session: false}));
