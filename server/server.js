@@ -66,7 +66,7 @@ app.get('/logout', function(req, res){
 });
 
 // allow CORS from anywhere
-// TODO: potential security concern
+// TODO: potential security concern. rplace '*' with the URL where you the UI is hosted
 app.options('*', cors());
 app.use(cors());
 
