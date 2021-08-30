@@ -11,6 +11,7 @@ const helmet = require('helmet');
 const healthRoutes = require('./routes/health-route.js');
 const patientsRoutes = require('./routes/patients-route.js');
 const examsRoutes = require('./routes/exams-route.js');
+const bodimedRoutes = require('./routes/bodimed-route.js');
 
 // import dependencies
 const IBMCloudEnv = require('ibm-cloud-env');
@@ -94,6 +95,7 @@ app.use('/api/patients', patientsRoutes);
 app.use('/api/exams', examsRoutes);
 app.use('/api-v2/patients', patientsRoutes);
 app.use('/api-v2/exams', examsRoutes);
+app.use('/bodimed', bodimedRoutes);
 app.use('/tokens', (req, res)=>{
   res.json(req.session.APPID_AUTH_CONTEXT);
 });

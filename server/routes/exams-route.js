@@ -29,3 +29,4 @@ router.post('/add', validate([
 ]), ExamsController.addExam);
 
 module.exports = router;
+
