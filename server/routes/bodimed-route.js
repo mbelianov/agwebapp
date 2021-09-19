@@ -6,5 +6,6 @@ const router = express.Router();
 
 // define routes
 router.get('/getPatients', BodimedController.getPatients);
+router.get('/getResults', BodimedController.getResults);
 
 module.exports = router;

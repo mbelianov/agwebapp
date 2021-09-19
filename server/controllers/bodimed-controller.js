@@ -2,13 +2,57 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const win1251 = require('./windows-1251');
 
-  /**
-   * get patient list from Bodimed. We are scraping their website. not the best approach but this is what we have...
-   * @param egn the EGN of the patinet we are serching for
-   * @param fromDate start date of the period we search
-   * @param untilDate start date of the period we search
-   * @return JSON array with all found patients
-   */
+/**
+ * get exam results from Bodimed database. We are scraping their website. not the best approach but this is what we have...
+ * @param idnap id of the exam in Bodimed database
+ * @param pass password for accessing the results
+ * @return HTML page with the exam reults
+ */
+
+exports.getResults = (req, res, next) => {
+  console.log('In route - Bodimed.getResults');
+
+  let headersList = {
+    "Accept": "*/*",
+    "User-Agent": "Thunder Client (https://www.thunderclient.io)",
+    "Content-Type": "application/x-www-form-urlencoded" 
+   }
+   
+  if (!req.query.idnap || !req.query.pass)
+    console.warn('Missing idnap or pass');
+
+  let reqOptions = {
+     url: "https://results.bodimed.com/new/results_patient.php",
+     method: "POST",
+     headers: headersList,
+     data: `idnap=${req.query.idnap}&pass=${req.query.pass}`,
+     responseType: 'arraybuffer',
+   }
+
+  axios.request(reqOptions)
+    .then(function (response) {
+      //console.log(win1251.decode(response.data));
+      let result = win1251.decode(response.data)
+      return res.status(200).json({ result });
+    })
+    .catch(error => {
+      console.log("getResults from Bodimed failed", error);
+      return res.status(500).json({
+        message: 'getResults from Bodimed failed',
+        error: error,
+      });
+    });
+
+}
+
+/**
+ * get patient list from Bodimed. We are scraping their website. not the best approach but this is what we have...
+ * @param egn the EGN of the patinet we are serching
+ * @param name the first name of the patient. if both egn and name are provided, egn will be used
+ * @param fromDate start date of the period we search
+ * @param untilDate start date of the period we search
+ * @return JSON array with all found patients
+ */
 exports.getPatients = (req, res, next) => {
   console.log('In route - Bodimed.getPatients');
 
@@ -54,7 +98,14 @@ exports.getPatients = (req, res, next) => {
     isActive: false
   };
 
-  if (req.query.egn){
+  if (req.query.firstname) {
+    filter.isActive = true,
+    filter.key = 'bodimed_patient_name',
+    filter.value = req.query.firstname
+  }
+
+  //search with egn has priority over firstname
+  if (req.query.egn) {
     filter.isActive = true,
     filter.key = 'bodimed_patient_egn',
     filter.value = req.query.egn
@@ -113,7 +164,7 @@ scrapeTable = (result, filter) => {
       if (tableHeaders[i])
         tableRow[tableHeaders[i]] = $(element).text().trim();
     });
-    if (!filter.isActive || (filter.isActive && filter.value == tableRow[filter.key]) )
+    if (!filter.isActive || (filter.isActive && tableRow[filter.key].toLowerCase().substr(0,filter.value.length) === filter.value.toLowerCase()))
       scrapedData.push(tableRow);
   });
   //console.log(scrapedData);
